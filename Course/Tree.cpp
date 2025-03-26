@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <string>
-#include "_Client.cpp"
+#include "Client.cpp"
 
 class Tree {
 public:
@@ -58,22 +58,13 @@ public:
 			} else if (tree->right != NULL) {
 				tree = tree->right;
 			} else {
-				cout << "Клиент удален!" << endl;
+				cout << "Клиент снят с обслуживания!" << endl;
 				tree = nullptr;
 				delete tree;
 			}
 			return;
 		}
 		tree = balance(tree);
-	}
-
-	void remove_all(Tree*& tree) {
-		if (!tree) return;
-		remove_all(tree->left);
-		remove_all(tree->right);
-		tree = nullptr;
-		delete tree;
-		return;
 	}
 
 	// MARK: Поиск

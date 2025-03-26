@@ -8,17 +8,6 @@
 #include "Rent.cpp"
 #include <iostream>
 
-//0 Метод сортировки: Подсчетом
-//0 Вид списка: Линейный однонаправленный
-
-/*
- 1) вставка (добавление) элемента;
- 2) просмотр (проход) списка;
- 3) поиск элемента;
- 4) удаление элемента.
- */
-
-// MARK: - Реализовано: вставка, удаление, поиск, печать, сортировка при добавлении
 struct ListNode {
 	ListNode* next;
 	Rent value;
@@ -151,7 +140,6 @@ class LinkedList {
 
 	Rent search_by_value(string value, bool is_card_number) {
 		if (ref == NULL) {
-			cout << "Список пуст" << endl;
 			return Rent();
 		}
 		ListNode* cur = ref;

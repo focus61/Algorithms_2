@@ -17,21 +17,13 @@
 #include "Date.cpp"
 
 class Bureau {
-/*
- !!! Данные о клиентах должны быть организованны в виде АВЛ-дерева поиска, упорядоченного по «номеру водительского удостоверения».
-
- !!! Данные об автомобилях должны быть организованны в виде хеш-таблицы, первичным ключом которой является «Государственный регистрационный номер». Метод хеширования определяется вариантом задания.
- */
 private:
-	Tree* client_tree; // клиентская база изначально пустая
-private:
+	Tree* client_tree;
 	Hash_table cars_table = Hash_table();
-private:
 	LinkedList* rent_list;
 
 public:
 	// MARK: Операции с клиентами
-	// TODO: - 61 BB 123123 == 61 BB 123123 НЕДОПУСТИМО добавлять одинаковые номера. Должны решать коллизии хэш функций, но номера должны быть разные
 	void client_registration() {
 		string card_number = input_card_number();
 		string full_name = input_str("Введите ФИО клиента:");
@@ -59,6 +51,16 @@ public:
 			return;
 		}
 		string card_number = input_card_number();
+		if (rent_list) {
+			Rent result_rent = rent_list->search_by_card_number(card_number);
+			if (!result_rent.regisration_number.empty() && result_rent.regisration_number != "-1") {
+				cout << "НЕВОЗМОЖНО УДАЛИТЬ: " << card_number << endl;
+			} else {
+				client_tree->remove(client_tree, card_number);
+			}
+			cout << endl;
+			return;
+		}
 		client_tree->remove(client_tree, card_number);
 		cout << endl;
 	}
@@ -75,20 +77,21 @@ public:
 		cout << endl;
 	}
 
-	// TODO: - ЗАМЕЧАНИЕ remove_all_clients
-	/*
-	 При снятии с обслуживания клиента должны быть уч-
-	 тены и обработаны ситуации, когда у клиента имеется выданный
-	 автомобиль. Аналогичным образом следует поступать и с удалени-
-	 ем сведений об автомобилях.
-	 */
 	void remove_all_clients() {
+
 		if (client_tree == NULL) {
 			cout << "Список пуст" << endl << endl;
 			return;
 		};
-		client_tree->remove_all(client_tree);
-		cout << "Успешное удаление!" << endl << endl;
+		Tree* new_tree = nullptr;
+		remove_clients(client_tree, new_tree);
+		if (new_tree) {
+			client_tree = new_tree;
+			cout << "Остальные клиенты сняты с обслуживания!" << endl << endl;
+		} else {
+			delete new_tree;
+			cout << "Клиенты сняты с обслуживания!" << endl << endl;
+		}
 	}
 
 	void search_client() {
@@ -102,7 +105,7 @@ public:
 		cout << "Адрес: " << client.address << endl;
 		if (rent_list) {
 			Rent result_rent = rent_list->search_by_card_number(client.card_number);
-			if (!result_rent.regisration_number.empty()) {
+			if (!result_rent.regisration_number.empty() && result_rent.regisration_number != "-1") {
 				cout << "Государственный регистрационный номер авто: " << result_rent.regisration_number << endl;
 			}
 		}
@@ -122,19 +125,6 @@ public:
 	}
 
 	// MARK: Операции с авто
-
-//	– добавление нового автомобиля; +
-//	– удаление сведений об автомобиле; +
-//	– просмотр всех имеющихся автомобилей; +
-//	– очистку данных об автомобилях; +
-
-//	– поиск автомобиля по «Государственному регистрационному номеру».
-//	Результаты поиска – все сведения о найденном автомобиле, а также ФИО и номер водительского удостоверения клиента,
-//	которому выдан этот автомобиль; +
-
-//	– поиск автомобиля по названию марки автомобиля. Результаты поиска – список найденных автомобилей
-//	с указанием «Государственный регистрационный номер», марки, цвета, года выпуска; +
-
 	void add_new_car() {
 		string regisration_number = input_registration_number();
 		string brand = input_str("Введите марку авто:");
@@ -147,7 +137,11 @@ public:
 
 	void remove_car() {
 		string registration_number = input_registration_number();
-		cars_table.remove(registration_number);
+		if (!cars_table.search(registration_number).is_available) {
+			cout << "Невозможно снять с обслуживания авто!" << endl;
+		} else {
+			cars_table.remove(registration_number);
+		}
 		cout << endl;
 	}
 
@@ -155,16 +149,19 @@ public:
 		cars_table.print();
 	}
 
-	// TODO: - ЗАМЕЧАНИЕ remove_all_cars
-	/*
-	 При снятии с обслуживания клиента должны быть уч-
-	 тены и обработаны ситуации, когда у клиента имеется выданный
-	 автомобиль. Аналогичным образом следует поступать и с удалени-
-	 ем сведений об автомобилях.
-	 */
 	void remove_all_cars() {
-		cars_table.remove_all();
-		cout << "Успешное удаление" << endl << endl;
+		bool all_deleted = true;
+		for (int i = 0; i < cars_table.max_size; i++) {
+			Node element = cars_table.table[i];
+			if (!element.key.empty() && !element.value.is_available) {
+				all_deleted = false;
+				cout << "Не удалось снять с обслуживания авто: " << element.value.registration_number << endl;
+			} else {
+				cars_table.table[i] = Node();
+			}
+		};
+		if (all_deleted) cout << "Успешное удаление всех авто" << endl;
+		cout << endl;
 	}
 
 	//	– поиск автомобиля по «Государственному регистрационному номеру».
@@ -300,6 +297,7 @@ public:
 
 		rent_list->remove(regisration_number);
 		if (rent_list->size == 0) {
+			rent_list = nullptr;
 			delete rent_list;
 		}
 		cars_table.change(regisration_number, true);
@@ -335,9 +333,9 @@ public:
 		client_tree->insert(client_tree, client1);
 		cout << "Клиенты добавлены!" << endl << endl;
 	}
-// E333KM-33 	11 BB 111111	26.3.2025 	27.3.2025
+	// E333KM-33 	11 BB 111111
+	// A111XY-11 	33 EE 333333
 	void testing_add_cars() {
-		// ANNNAA-NN
 		//		set<string> chars {"A", "B", "E", "K", "M", "H", "O", "P", "C", "T", "Y", "X"};
 		Car car1 = Car("A111XY-11", "BMW", "red", 1999);
 		if (cars_table.search(car1.registration_number).registration_number != "-1") return;
@@ -519,6 +517,25 @@ private:
 		return true;
 	}
 
+	void remove_clients(Tree*& tree, Tree*& not_deleted_tree) {
+		if (!tree) return;
+		remove_clients(tree->left, not_deleted_tree);
+		remove_clients(tree->right, not_deleted_tree);
+		if (rent_list) {
+			Rent result_rent = rent_list->search_by_card_number(tree->client.card_number);
+			if (!result_rent.regisration_number.empty() && result_rent.regisration_number != "-1") {
+				Car car = cars_table.search(result_rent.regisration_number);
+				if (!car.is_available) {
+					not_deleted_tree->insert(not_deleted_tree, tree->client);
+					cout << "НЕВОЗМОЖНО УДАЛИТЬ: " << tree->client.card_number << endl;
+				}
+			}
+		}
+		tree = nullptr;
+		delete tree;
+		return;
+	}
+
 	// MARK: - Приватные функции для авто
 	// Государственный регистрационный номер – строка формата
 	// «ANNNAA-NN», где N –цифра; A – буква из следующего множества:
@@ -643,367 +660,4 @@ private:
 		cars_table.change(regisration_number, !to_repair);
 		cout << success_desc << endl << endl;
 	}
-/*
- – регистрацию нового клиента; +
- – снятие с обслуживания клиента; +
- – просмотр всех зарегистрированных клиентов; +
- – очистку данных о клиентах; +
- – поиск клиента по «номер водительского удостоверения». Результаты поиска – все сведения о найденном клиенте и государственный регистрационный номер автомобиля, который ему выдан; +
- – поиск клиента по фрагментам ФИО или адреса. Результаты поиска – список найденных клиентов с указанием номера водительского удостоверения, ФИО и адреса; +
-
- 57
-
-
- – регистрацию отправки автомобиля в ремонт;
- – регистрацию прибытия автомобиля из ремонта;
- – регистрацию выдачи клиенту автомобиля на прокат;
- – регистрацию возврата автомобиля от клиентов
- */
 };
-//
-//int main() {
-//	Bureau* bureau = new Bureau();
-//	bureau->car_to_rent();
-//
-//	return 0;
-//}
-//	Bureau b = Bureau();
-//	b.addNewCar("A321BD-42");
-//	b.addNewCar("A321BD-42");
-
-//	Client client1;
-//	client1.address = "client1.address";
-//	client1.card_number = "1";
-//	client1.full_name = "client1.full_name";
-//	client1.passport = "client1.passport";
-//
-//	Client client3;
-//	client3.address = "client2.address";
-//	client3.card_number = "3";
-//	client3.full_name = "client2.full_name";
-//	client3.passport = "client2.passport";
-//
-//	Client client4;
-//	client4.address = "client3.address";
-//	client4.card_number = "4";
-//	client4.full_name = "client3.full_name";
-//	client4.passport = "client3.passport";
-//
-//	Client client5;
-//	client5.address = "client4.address";
-//	client5.card_number = "5";
-//	client5.full_name = "client4.full_name";
-//	client5.passport = "client4.passport";
-//
-//	Client client6;
-//	client6.address = "client5.address";
-//	client6.card_number = "6";
-//	client6.full_name = "client5.full_name";
-//	client6.passport = "client5.passport";
-//
-//
-//	Client client7;
-//	client7.address = "client5.address";
-//	client7.card_number = "7";
-//	client7.full_name = "client5.full_name";
-//	client7.passport = "client5.passport";
-//
-//	Client client8;
-//	client8.address = "client5.address";
-//	client8.card_number = "8";
-//	client8.full_name = "client5.full_name";
-//	client8.passport = "client5.passport";
-
-//	Client client8;
-//	client8.address = "client5.address";
-//	client8.card_number = "8";
-//	client8.full_name = "client5.full_name";
-//	client8.passport = "client5.passport";
-
-//	Tree* tree = nullptr;
-//	tree->insert(tree, client6);
-//	tree->insert(tree, client3);
-//	tree->insert(tree, client7);
-//	tree->insert(tree, client1);
-//	tree->insert(tree, client4);
-//	tree->insert(tree, client5);
-//	tree->insert(tree, client8);
-//	tree->show(tree);
-//	tree->remove(tree, "3");
-//	tree->show(tree);
-//	Client search_client = tree->search(tree, "4");
-
-// MARK: - ХЭЩ ТАБЛИЦА
-//	Hash_table hash = Hash_table();
-//	Car car = Car("1111", "BMW", "RED", 2022, true);
-//	hash.insert(car);
-//
-//	Car car2 = Car("2222", "MERS", "BLUE", 2022, true);
-//	hash.insert(car2);
-//
-//	Car car3 = Car("3333", "MERS", "BLUE", 2022, true);
-//	hash.insert(car3);
-//
-//
-//	Car car4 = Car("4444", "MERS", "BLUE", 2022, true);
-//	hash.insert(car4);
-//
-//
-//
-//	Car car5 = Car("5555", "MERS", "BLUE", 2022, true);
-//	hash.insert(car5);
-//
-//
-//	Car car6 = Car("6666", "MERS", "BLUE", 2022, true);
-//	Car car7 = Car("6666", "MERS2", "BLUE2", 2022, true);
-//	hash.insert(car6);
-//	hash.insert(car7);
-//	hash.print();
-//	hash.search(car6);
-//	hash.remove(car6);
-//	hash.search(car6);
-//	hash.print();
-//	hash.remove(car6);
-//	hash.search(car6);
-//	hash.print();
-//	cout << "=====" << endl;
-//	hash.remove(car);
-//	hash.remove(car3);
-//	hash.remove(car4);
-//	hash.remove(car5);
-//	hash.remove(car6);
-//	hash.remove(car5);
-//	hash.print();
-//
-//	hash.insert(car);
-//	hash.insert(car);
-//	hash.insert(car);
-//	hash.insert(car);
-//	hash.insert(car);
-//	hash.print();
-//	hash.insert(car2);
-//	hash.insert(car2);
-//	hash.insert(car2);
-//	hash.print();
-//	hash.remove(car2);
-//	hash.remove(car2);
-//	hash.print();
-
-	// Номер водительского удостоверения – строка формата «RR AA NNNNNN», где
-	// RR – код региона (цифры);
-	// AA – серия (буквы из следующего множества: А, В, Е, К, М, Н, О, Р, С, Т, У, Х);
-	// NNNNNN – порядковый номер удостоверения (цифры). Код, серия и номер отделяются друг от друга пробелами;
-
-	// MARK: - is_correct_card_number
-//	cout << "Корректный ли номер?: "<< client8.is_correct_card_number("22 A4 123456") << endl;
-//	cout << "=========" << endl;
-//	cout << (tree->search(tree, "7") ? "YES" : "NO   7") << endl;
-//	cout << "=========" << endl;
-//	cout << (tree->search(tree, "6") ? "YES" : "NO   6") << endl;
-//	cout << "=========" << endl;
-//	cout << (tree->search(tree, "5") ? "YES   5" : "NO   5") << endl;
-//	cout << "=========" << endl;
-//	cout << (tree->search(tree, "4") ? "YES" : "NO   4") << endl;
-//	cout << "=========" << endl;
-//	cout << (tree->search(tree, "3") ? "YES" : "NO   3") << endl;
-//	cout << "=========" << endl;
-//	cout << (tree->search(tree, "2") ? "YES" : "NO   2") << endl;
-//	cout << "=========" << endl;
-//	cout << (tree->search(tree, "9") ? "YES" : "NO   9") << endl;
-//	cout << "=========" << endl;
-//	cout << (tree->search(tree, "1") ? "YES 1" : "NO   9") << endl;
-
-// MARK: - LINKED LIST
-//	Rent rent1 = Rent("1111", "1111", "1111", "1111");
-//	Rent rent2 = Rent("2222", "2222", "2222", "2222");
-//	Rent rent6 = Rent("2222", "2222", "2222", "2222");
-//	Rent rent7 = Rent("3333", "3333", "3333", "3333");
-//	Rent rent8 = Rent("3333", "3333", "3333", "3333");
-//
-//	Rent rent3 = Rent("3333", "3333", "3333", "3333");
-//	Rent rent4 = Rent("4444", "4444", "4444", "4444");
-//
-//	LinkedList list = LinkedList(rent4);
-////	list.append(rent2);
-////	list.append(rent7);
-////	list.append(rent1);
-////	list.append(rent3);
-////	list.append(rent8);
-////	list.append(rent6);
-//	list.remove(rent4.regisration_number);
-//	list.print();
-//	list.search(rent2.regisration_number);
-//	list.remove(rent1.regisration_number);
-//	list.remove(rent4.regisration_number);
-//	list.remove(rent3.regisration_number);
-//	list.remove(rent2.regisration_number);
-
-//	cout << "Высота: " << tree->get_height(tree) << endl;
-//	tree = tree->big_rotate_right(tree);
-//	cout << "====" << endl;
-//	tree->show(tree);
-
-	//
-
-
-//	Bureau bureau = Bureau();
-//	bureau.client_registration("1", "Afonin");
-//	bureau.client_registration("2", "Ivanov");
-//	bureau.client_registration("3", "Petukhov");
-//	bureau.client_registration("4", "Ologev");
-//	bureau.client_registration("5", "Ivanova");
-//	bureau.print_clients();
-////	bureau.remove_all();
-//	bureau.print_clients();
-////	bureau.add_new_car("5555");
-//	bureau.print_cars();
-//	bureau.add_new_rent("3", "5555");
-//	bureau.print_rent();
-//	bureau.search_client("4");
-//	bureau.search_clients_fullname("Ivanov");
-//	bureau.search_clients_address("1");
-//	bureau.search_clients_address("10");
-
-
-//	bureau.add_new_car();
-
-//	По данному числу N определите количество последовательностей из нулей и единиц длины N, в которых никакие три единицы не стоят рядом.
-//	235
-//
-//
-//	return 0;
-//}
-
-/*
- 1 Предметная область: Обслуживание клиентов в бюро проката автомобилей (см. п. 9.2)
- 1 Метод хеширования: Закрытое хеширование с линейным опробованием
- 0 Метод сортировки: Подсчетом
- 0 Вид списка: Линейный однонаправленный
- 1 Метод обхода дерева: Обратный
- 1 Алгоритм поиска слова в тексте: Прямой
- */
-
-/*
- 9.2.1. Информационная система для предметной области «Обслу-
- живание клиентов в бюро проката автомобилей» должна осущест-
- влять ввод, хранение, обработку и вывод данных о:
- – клиентах;
- – автомобилях, принадлежащих бюро проката;
- – выдаче на прокат и возврате автомобилей от клиентов.
- 9.2.2. Данные о каждом клиенте должны содержать:
- – Номер водительского удостоверения – строка формата «RR AA
- NNNNNN», где RR – код региона (цифры); AA – серия (буквы из сле-
- дующего множества: А, В, Е, К, М, Н, О, Р, С, Т, У, Х); NNNNNN –
- порядковый номер удостоверения (цифры). Код, серия и номер отде-
- ляются друг от друга пробелами;
- – ФИО – строка;
- – Паспортные данные – строка;
- – Адрес – строка.
- Примечание: длина строк (кроме номер водительского удостове-
- рения) определяется студентом самостоятельно.
- 9.2.3. Данные о клиентах должны быть организованны в виде
- АВЛ-дерева поиска, упорядоченного по «номеру водительского удо-
- стоверения».
- 9.2.4. Данные о каждом автомобиле должны содержать:
- – Государственный регистрационный номер – строка формата
- «ANNNAA-NN», где N –цифра; A – буква из следующего множества:
- А, В, Е, К, М, Н, О, Р, С, Т, У, Х;
- – Марку – строка;
- – Цвет – строка;
- – Год выпуска – целое;
- – Признак наличия – логическое.
- Примечание: длина строк (кроме «Государственного регистраци-
- онного номера») определяется студентом самостоятельно.
- 9.2.5. Данные об автомобилях должны быть организованны в ви-
- де хеш-таблицы, первичным ключом которой является «Государ-
- ственный регистрационный номер». Метод хеширования определя-
- ется вариантом задания.
- 9.2.6. Данные о выдаче на прокат или возврате автомобилей от
- клиентов должны содержать:
- – строку, формат которой соответствует аналогичной строке
- в данных о клиентах;
- 56
- – Государственный регистрационный номер – строка, формат ко-
- торой соответствует аналогичной строке в данных об автомобилях;
- – Дату выдачи – строка;
- – Дату возврата – строка.
- Примечание: наличие в этих данных записи, содержащей в поле
- «Номер водительского удостоверения» значение X и в поле «Госу-
- дарственный регистрационный номер» значение Y, означает выда-
- чу клиенту с номером водительского удостоверения X автомобиля
- с государственным регистрационным номером Y . Отсутствие такой
- записи означает, что клиенту с номером водительского удостовере-
- ния X не выдавался автомобиль с номером Y .
- 9.2.7. Данные о выдаче на прокат или возврате автомобилей от
- клиентов должны быть организованны в виде списка, который упо-
- рядочен по первичному ключу – «Государственный регистрацион-
- ный номер». Вид списка и метод сортировки определяются вариан-
- том задания.
- 9.2.8. Информационная система «Обслуживание клиентов в бю-
- ро проката автомобилей» должна осуществлять следующие опе-
- рации:
- – регистрацию нового клиента;
- – снятие с обслуживания клиента;
- – просмотр всех зарегистрированных клиентов;
- – очистку данных о клиентах;
- – поиск клиента по «номер водительского удостоверения». Ре-
- зультаты поиска – все сведения о найденном клиенте и государ-
- ственный регистрационный номер автомобиля, который ему
- выдан;
- – поиск клиента по фрагментам ФИО или адреса. Результаты по-
- иска – список найденных клиентов с указанием номера водитель-
- ского удостоверения, ФИО и адреса;
- – добавление нового автомобиля;
- – удаление сведений об автомобиле;
- – просмотр всех имеющихся автомобилей;
- – очистку данных об автомобилях;
- – поиск автомобиля по «Государственному регистрационному
- номеру». Результаты поиска – все сведения о найденном автомоби-
- ле, а также ФИО и номер водительского удостоверения клиента, ко-
- торому выдан этот автомобиль;
- – поиск автомобиля по названию марки автомобиля. Результа-
- ты поиска – список найденных автомобилей с указанием «Государ-
- ственный регистрационный номер», марки, цвета, года выпуска;
- 57
- – регистрацию отправки автомобиля в ремонт;
- – регистрацию прибытия автомобиля из ремонта;
- – регистрацию выдачи клиенту автомобиля на прокат;
- – регистрацию возврата автомобиля от клиентов.
- 9.2.9. Состав данных о клиенте или автомобиле, выдаваемых при
- просмотре всех зарегистрированных клиентов или просмотре всех
- автомобилей, принадлежащих бюро проката, определяется студен-
- том самостоятельно, но должен содержать не менее двух полей.
- 9.2.10. Метод поиска автомобиля по марке определяется студен-
- том самостоятельно. Выбранный метод необходимо сравнить с аль-
- тернативными методами.
- 9.2.11. Поиск клиента по фрагментам ФИО или адреса должен
- осуществляться путем систематического обхода АВЛ-дерева поис-
- ка. Метод обхода определяется вариантом задания. При поиске кли-
- ента по фрагментам ФИО или адреса могут быть заданы как полное
- ФИО или адрес, так и их части (например, только фамилия клиен-
- та без имени и отчества, только название улицы из адреса). Для об-
- наружения заданного фрагмента в полном ФИО или адресе должен
- применяться алгоритм поиска слова в тексте, указанный в вариан-
- те задания.
- 9.2.12. Регистрация отправки автомобиля на ремонт должна
- осуществляться только при наличии этого автомобиля (значение
- поля «Признак наличия» для соответствующего автомобиля име-
- ет значение «Истина»). При этом значение поля «Признак нали-
- чия» для соответствующего автомобиля изменяется на значение
- «Ложь».
- 9.2.13. При регистрации прибытия автомобиля из ремонта зна-
- чение поля «Признак наличия» для соответствующего автомобиля
- изменяется на значение «Истина».
- 9.2.14. Регистрация выдачи автомобиля клиенту должна осу-
- ществляться только при наличии свободного выдаваемого автомо-
- били (значение поля «Признак наличия» для соответствующего ав-
- томобиля имеет значение «Истина»).
- 9.2.15. При регистрации выдачи автомобиля клиенту или воз-
- врата автомобиля от клиента должно корректироваться значение
- поля «Признак наличия» для соответствующего автомобиля.
- 9.2.16. При снятии с обслуживания клиента должны быть уч-
- тены и обработаны ситуации, когда у клиента имеется выданный
- автомобиль. Аналогичным образом следует поступать и с удалени-
- ем сведений об автомобилях.
- */
-

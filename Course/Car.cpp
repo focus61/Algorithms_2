@@ -32,7 +32,7 @@ public:
 	color(color),
 	release_year(release_year),
 	is_available(true) {}
-public:
+
 	Car():
 	registration_number("-1"),
 	brand(""),

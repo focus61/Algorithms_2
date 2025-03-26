@@ -6,7 +6,7 @@
 //
 
 #include <iostream>
-#include "_Car.cpp"
+#include "Car.cpp"
 
 using namespace std;
 
@@ -76,10 +76,6 @@ public:
 				return;
 			}
 		}
-	}
-
-	void remove_all() {
-		for (int i = 0; i < max_size; i++) table[i] = Node();
 	}
 
 	void change(string registration_number, bool is_available) {

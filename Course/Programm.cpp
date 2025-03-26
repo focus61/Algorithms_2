@@ -7,27 +7,7 @@
 
 #include <iostream>
 #include "Bureau.cpp"
-/*
- – добавление нового автомобиля; +
- – удаление сведений об автомобиле;
- – просмотр всех имеющихся автомобилей;
- – очистку данных об автомобилях;
- – поиск автомобиля по «Государственному регистрационному
- номеру». Результаты поиска – все сведения о найденном автомоби-
- ле, а также ФИО и номер водительского удостоверения клиента, ко-
- торому выдан этот автомобиль; +
 
- – поиск автомобиля по названию марки автомобиля. Результа-
- ты поиска – список найденных автомобилей с указанием «Государ-
- ственный регистрационный номер», марки, цвета, года выпуска;
- 57
-
-
- – регистрацию отправки автомобиля в ремонт;
- – регистрацию прибытия автомобиля из ремонта;
- – регистрацию выдачи клиенту автомобиля на прокат;
- – регистрацию возврата автомобиля от клиентов
- */
 void client_operations(Bureau* bureau);
 void car_operations(Bureau* bureau);
 void rent_operations(Bureau* bureau);
@@ -40,11 +20,12 @@ int main() {
 
 // MARK: - Клиент ГОТОВ ПОЛНОСТЬЮ
 void client_operations(Bureau* bureau, bool is_test) {
+	bool is_only_once_test = is_test;
 	while (true) {
 		int selected;
 		cout << "1. Зарегистрировать нового клиента" << endl;
 		cout << "2. Снять клиента с обслуживания" << endl;
-		cout << "3. Просмотр всех зарегестрированных клиентов" << endl;
+		cout << "3. Просмотр всех зарегистрированных клиентов" << endl;
 		cout << "4. Очистить данные о клиентах" << endl;
 		cout << "5. Поиск клиента по номеру водительского удостоверения" << endl;
 		cout << "6. Поиск клиента по фрагменту ФИО" << endl;
@@ -55,8 +36,9 @@ void client_operations(Bureau* bureau, bool is_test) {
 		cout << endl;
 		switch (selected) {
 			case 1:
-				if (is_test) {
+				if (is_only_once_test) {
 					bureau->testing_add_clients();
+					is_only_once_test = false;
 				} else {
 					bureau->client_registration();
 				}
@@ -74,6 +56,7 @@ void client_operations(Bureau* bureau, bool is_test) {
 }
 // MARK: - Машины ГОТОВ ПОЛНОСТЬЮ
 void car_operations(Bureau* bureau, bool is_test) {
+	bool is_only_once_test = is_test;
 	while (true) {
 		int selected;
 		cout << "1. Добавить новый автомобиль" << endl;
@@ -88,8 +71,9 @@ void car_operations(Bureau* bureau, bool is_test) {
 		cout << endl;
 		switch (selected) {
 			case 1:
-				if (is_test) {
+				if (is_only_once_test) {
 					bureau->testing_add_cars();
+					is_only_once_test = false;
 				} else {
 					bureau->add_new_car();
 				}

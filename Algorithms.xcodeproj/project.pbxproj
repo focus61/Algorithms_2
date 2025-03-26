@@ -12,9 +12,9 @@
 		1F5AFB122D9094C200B586C0 /* Programm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F5AFB112D9094C200B586C0 /* Programm.cpp */; };
 		1F5AFB142D91FCB500B586C0 /* Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F5AFB132D91FCB500B586C0 /* Date.cpp */; };
 		1F9F73372D7BAFB800B16AB1 /* Bureau.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1F9F73362D7BAFB800B16AB1 /* Bureau.cpp */; };
-		1FCE26CE2D7CF1F20052468C /* _Client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCE26CD2D7CF1F20052468C /* _Client.cpp */; };
+		1FCE26CE2D7CF1F20052468C /* Client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCE26CD2D7CF1F20052468C /* Client.cpp */; };
 		1FCE26D02D7E59170052468C /* Tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCE26CF2D7E59170052468C /* Tree.cpp */; };
-		1FCE26D42D7E595E0052468C /* _Car.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCE26D32D7E595E0052468C /* _Car.cpp */; };
+		1FCE26D42D7E595E0052468C /* Car.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCE26D32D7E595E0052468C /* Car.cpp */; };
 		1FCE26D62D7E59690052468C /* Hashtable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1FCE26D52D7E59690052468C /* Hashtable.cpp */; };
 /* End PBXBuildFile section */
 
@@ -37,9 +37,9 @@
 		1F5AFB112D9094C200B586C0 /* Programm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Programm.cpp; sourceTree = "<group>"; };
 		1F5AFB132D91FCB500B586C0 /* Date.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Date.cpp; sourceTree = "<group>"; };
 		1F9F73362D7BAFB800B16AB1 /* Bureau.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Bureau.cpp; sourceTree = "<group>"; };
-		1FCE26CD2D7CF1F20052468C /* _Client.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = _Client.cpp; sourceTree = "<group>"; };
+		1FCE26CD2D7CF1F20052468C /* Client.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Client.cpp; sourceTree = "<group>"; };
 		1FCE26CF2D7E59170052468C /* Tree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tree.cpp; sourceTree = "<group>"; };
-		1FCE26D32D7E595E0052468C /* _Car.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = _Car.cpp; sourceTree = "<group>"; };
+		1FCE26D32D7E595E0052468C /* Car.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Car.cpp; sourceTree = "<group>"; };
 		1FCE26D52D7E59690052468C /* Hashtable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Hashtable.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -74,9 +74,9 @@
 			isa = PBXGroup;
 			children = (
 				1F9F73362D7BAFB800B16AB1 /* Bureau.cpp */,
-				1FCE26CD2D7CF1F20052468C /* _Client.cpp */,
+				1FCE26CD2D7CF1F20052468C /* Client.cpp */,
 				1FCE26CF2D7E59170052468C /* Tree.cpp */,
-				1FCE26D32D7E595E0052468C /* _Car.cpp */,
+				1FCE26D32D7E595E0052468C /* Car.cpp */,
 				1FCE26D52D7E59690052468C /* Hashtable.cpp */,
 				1F5AFAFC2D8B5DBF00B586C0 /* Rent.cpp */,
 				1F5AFB002D8B5EFB00B586C0 /* List.cpp */,
@@ -148,9 +148,9 @@
 			files = (
 				1F9F73372D7BAFB800B16AB1 /* Bureau.cpp in Sources */,
 				1F5AFAFD2D8B5DBF00B586C0 /* Rent.cpp in Sources */,
-				1FCE26CE2D7CF1F20052468C /* _Client.cpp in Sources */,
+				1FCE26CE2D7CF1F20052468C /* Client.cpp in Sources */,
 				1F5AFB142D91FCB500B586C0 /* Date.cpp in Sources */,
-				1FCE26D42D7E595E0052468C /* _Car.cpp in Sources */,
+				1FCE26D42D7E595E0052468C /* Car.cpp in Sources */,
 				1F5AFB122D9094C200B586C0 /* Programm.cpp in Sources */,
 				1F5AFB012D8B5EFB00B586C0 /* List.cpp in Sources */,
 				1FCE26D02D7E59170052468C /* Tree.cpp in Sources */,
