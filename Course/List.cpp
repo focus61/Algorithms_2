@@ -74,7 +74,6 @@ class LinkedList {
 		}
 
 		if (ref->value.regisration_number == regisration_number) {
-			ref = nullptr;
 			delete ref;
 			size--;
 			cout << "Успешный возврат автомобиля!" << endl;
@@ -85,7 +84,6 @@ class LinkedList {
 		ListNode* prev = ref;
 		if (cur->value.regisration_number == regisration_number) {
 			ref = ref->next;
-			cur = nullptr;
 			size--;
 			delete cur;
 			cout << "Успешное удаление!" << endl;
@@ -95,7 +93,6 @@ class LinkedList {
 		while (cur != NULL) {
 			if (cur->value.regisration_number == regisration_number) {
 				prev->next = cur->next;
-				cur = nullptr;
 				delete cur;
 				size--;
 				cout << "Успешное удаление!" << endl;

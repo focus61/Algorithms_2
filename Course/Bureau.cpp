@@ -297,7 +297,6 @@ public:
 
 		rent_list->remove(regisration_number);
 		if (rent_list->size == 0) {
-			rent_list = nullptr;
 			delete rent_list;
 		}
 		cars_table.change(regisration_number, true);
@@ -532,7 +531,6 @@ private:
 				}
 			}
 		}
-		tree = nullptr;
 		delete tree;
 		return;
 	}

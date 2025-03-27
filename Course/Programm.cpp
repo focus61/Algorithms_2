@@ -134,7 +134,6 @@ void main_menu(bool is_test) {
 					break;
 				} else return;
 			case 0:
-				bureau = nullptr;
 				delete bureau;
 				return;
 			default:

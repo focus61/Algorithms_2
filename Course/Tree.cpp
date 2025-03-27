@@ -59,7 +59,6 @@ public:
 				tree = tree->right;
 			} else {
 				cout << "Клиент снят с обслуживания!" << endl;
-				tree = nullptr;
 				delete tree;
 			}
 			return;
