@@ -95,7 +95,7 @@ public:
 		// Если search_value содержится в fio, добавляем в результат
 		Client client = tree->client;
 		string rule_value = is_fio ? client.full_name : client.address;
-		if (contains(rule_value, search_value)) {
+		if (contains_word(rule_value, search_value)) {
 			result.push_back(tree->client);
 		}
 
@@ -190,5 +190,36 @@ private:
 			if (found) return true;
 		}
 		return false;
+	}
+
+	// MARK: - Алгоритм прямого поиска в тексте
+	bool contains_word(string value, string input) {
+		// abcd - abcf = false
+		// abcd - abc = true
+		// a - abc = false
+		// ab - abc = false
+		// abc - ab = true
+		if (value.size() < input.size()) return false;
+		vector<char> value_arr(value.begin(), value.end());
+		vector<char> input_arr(input.begin(), input.end());
+		int value_index = 0;
+		int changed_value_index = 0;
+		size_t result = input.size();
+		while (true) {
+			value_index = changed_value_index;
+			if (result == 0) return true;
+			if (value_index == value.size()) return false;
+			for (char element : input_arr) {
+				if (element != value_arr[value_index]) {
+					changed_value_index++;
+					result = input.size();
+					break;
+				} else {
+					result--;
+				}
+				value_index++;
+			}
+		}
+		return true;
 	}
 };

@@ -392,6 +392,7 @@ private:
 	string default_str(string description)
 	{
 		string value;
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << description << " ";
 		getline(cin, value);
 		return value;
